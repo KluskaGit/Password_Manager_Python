@@ -2,8 +2,8 @@ DROP DATABASE IF EXISTS m28441_passwords_manager;
 CREATE DATABASE m28441_passwords_manager;
 USE m28441_passwords_manager;
 
-DROP TABLE IF EXISTS users;
 
+DROP TABLE IF EXISTS all_passwords;
 CREATE TABLE all_passwords
 (
     pass_id int(11) AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -12,6 +12,7 @@ CREATE TABLE all_passwords
     password varchar(255)
 );
 
+DROP TABLE IF EXISTS users;
 CREATE TABLE users
 (
     user_id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
