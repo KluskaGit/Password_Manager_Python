@@ -40,15 +40,16 @@ def menuPass(id):
             menu()
 
 def display_pas(id):
-    pass
+    cursor.execute(f'SELECT * From all_passwords where user_id={id}')
+    rows=cursor.fetchall()
+    for row in rows:
+        print(f"Platform: {row['platform']}\nPassword: {row['password']}\n-------------------")
 
 def add_pass(id):
     os.system('cls')
     platform=input('Platform name: ')
     password=input('Password: ')
-
-    hash_pas=ph.hash(password)
-    cursor.execute(f'INSERT INTO all_passwords (user_id, platform, password) values ({id}, "{platform}", "{hash_pas}")')
+    cursor.execute(f'INSERT INTO all_passwords (user_id, platform, password) values ({id}, "{platform}", "{password}")')
     conn.commit()
     print('Password has been added')
     menuPass(id)
@@ -72,8 +73,6 @@ def log_in():
                 print('Invalid login or password')
                 log_in()
         
-
-
 #Register function
 def register():
     email=input('Your email: ')
@@ -84,7 +83,7 @@ def register():
         hash_pas=ph.hash(password)
         cursor.execute(f'INSERT INTO users (email, password) values ("{email}", "{hash_pas}")')
         conn.commit()
-        #log_in()
+        log_in()
 
     
 
