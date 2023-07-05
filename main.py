@@ -1,5 +1,6 @@
 import mysql.connector
 from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
 #MENU
 def menu():
@@ -15,12 +16,43 @@ def menu():
             log_in()
         case '2':
             register()
+        case other:
+            print('No match found')
+            menu()
 
+def menuPass():
+    print("""
+    1. Display password
+    2. Add new password
+    3. Log out
+    """)
+    choice=input('Option : ')
+    match choice:
+        case '1':
+            log_in()
+        case '2':
+            register()
+        case other:
+            print('No match found')
+            menu()
 
 #Log in function
 def log_in():
-    login=input('Login: ')
+    email=input('Email: ')
     password=input('Password: ')
+    cursor.execute(f'SELECT * From users where email like "{email}"')
+
+    all_users_data=cursor.fetchall()
+    if all_users_data!=[] and len(all_users_data)==1:
+        for row in all_users_data:
+            try:
+                if ph.verify(row['password'], password):
+                    menuPass()
+            except VerifyMismatchError:
+                print('Invalid login or password')
+                log_in()
+        
+
 
 #Register function
 def register():
@@ -32,7 +64,7 @@ def register():
         hash_pas=ph.hash(password)
         cursor.execute(f'INSERT INTO users (email, password) values ("{email}", "{hash_pas}")')
         conn.commit()
-        log_in()
+        #log_in()
 
     
 
@@ -45,10 +77,9 @@ if __name__=='__main__':
         host='localhost',
         database='m28441_passwords_manager'
         )
-    cursor=conn.cursor()
+    cursor=conn.cursor(dictionary=True)
+    menu()
 
-    register()
-        
 
 
 
