@@ -1,6 +1,7 @@
 import mysql.connector
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+import os
 
 #MENU
 def menu():
@@ -20,7 +21,7 @@ def menu():
             print('No match found')
             menu()
 
-def menuPass():
+def menuPass(id):
     print("""
     1. Display password
     2. Add new password
@@ -29,12 +30,31 @@ def menuPass():
     choice=input('Option : ')
     match choice:
         case '1':
-            log_in()
+            display_pas(id)
         case '2':
-            register()
+            add_pass(id)
+        case '3':
+            log_out()
         case other:
             print('No match found')
             menu()
+
+def display_pas(id):
+    pass
+
+def add_pass(id):
+    os.system('cls')
+    platform=input('Platform name: ')
+    password=input('Password: ')
+
+    hash_pas=ph.hash(password)
+    cursor.execute(f'INSERT INTO all_passwords (user_id, platform, password) values ({id}, "{platform}", "{password}")')
+    conn.commit()
+    print('Password has been added')
+    menuPass(id)
+    
+def log_out():
+    pass
 
 #Log in function
 def log_in():
@@ -47,7 +67,7 @@ def log_in():
         for row in all_users_data:
             try:
                 if ph.verify(row['password'], password):
-                    menuPass()
+                    menuPass(row['user_id'])
             except VerifyMismatchError:
                 print('Invalid login or password')
                 log_in()
@@ -78,7 +98,7 @@ if __name__=='__main__':
         database='m28441_passwords_manager'
         )
     cursor=conn.cursor(dictionary=True)
-    menu()
+    log_in()
 
 
 
