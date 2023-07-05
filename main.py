@@ -48,7 +48,7 @@ def add_pass(id):
     password=input('Password: ')
 
     hash_pas=ph.hash(password)
-    cursor.execute(f'INSERT INTO all_passwords (user_id, platform, password) values ({id}, "{platform}", "{password}")')
+    cursor.execute(f'INSERT INTO all_passwords (user_id, platform, password) values ({id}, "{platform}", "{hash_pas}")')
     conn.commit()
     print('Password has been added')
     menuPass(id)
