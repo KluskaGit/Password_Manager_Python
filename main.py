@@ -108,19 +108,22 @@ def log_in():
 def register():
     os.system('cls')
     print("Register here:\n")
-
     email=input('Your email: ')
     password=input('Password: ')
     r_password=input('Repeat password: ')
 
-    if password==r_password:
-        hash_pas=ph.hash(password)
-        cursor.execute(f'INSERT INTO users (email, password) values ("{email}", "{hash_pas}")')
-        conn.commit()
-        menu()
-    
+    if email_verify(email):
+        if password==r_password:
+            hash_pas=ph.hash(password)
+            cursor.execute(f'INSERT INTO users (email, password) values ("{email}", "{hash_pas}")')
+            conn.commit()
+            menu()
 
-    
+#Prevent accounts with the same email
+def email_verify(em):
+    cursor.execute(f'SELECT * FROM users where email like "{em}"')
+    rows=cursor.fetchall()
+    return rows==[]
 
 if __name__=='__main__':
 
