@@ -4,7 +4,7 @@ from argon2.exceptions import VerifyMismatchError
 import os
 
 #MENU
-def menu():
+def menu(err):
     os.system('cls')
     print("""
     -------MENU-------
@@ -15,14 +15,14 @@ def menu():
     choice=input('Option: ')
     match choice:
         case '1':
-            log_in()
+            log_in(err)
         case '2':
-            register()
+            register(err)
         case other:
-            menu()
+            menu(err)
 
 #Second menu after log in
-def menuPass(id):
+def menuPass(id, err):
     os.system('cls')
     print("""
     1. Display password
@@ -33,18 +33,18 @@ def menuPass(id):
     choice=input('Option: ')
     match choice:
         case '1':
-            display_pas(id)
+            display_pas(id, err)
         case '2':
-            add_pass(id)
+            add_pass(id, err)
         case '3':
-            log_out()
+            log_out(err)
         case '4':
             quit()
         case other:
-            menuPass(id)
+            menuPass(id, err)
 
 #View existing passwords
-def display_pas(id):
+def display_pas(id, err):
     os.system('cls')
     print('Your passwords:\n')
     cursor.execute(f'SELECT * From all_passwords where user_id={id}')
@@ -56,21 +56,21 @@ def display_pas(id):
         choice=input("Option: ")
         match choice:
             case '1':
-                menuPass(id)
+                menuPass(id, err)
             case other:
-                display_pas(id)
+                display_pas(id, err)
     else:
         print('No passwords to display')
         print('\n1. Go back')
         choice=input("Option: ")
         match choice:
             case '1':
-                menuPass(id)
+                menuPass(id, err)
             case other:
-                display_pas(id)
+                display_pas(id, err)
 
 #Adding new passwords
-def add_pass(id):
+def add_pass(id, err):
     os.system('cls')
     print('Add new password here:\n')
     platform=input('Platform name: ')
@@ -78,17 +78,17 @@ def add_pass(id):
     cursor.execute(f'INSERT INTO all_passwords (user_id, platform, password) values ({id}, "{platform}", "{password}")')
     conn.commit()
     print('Password has been added')
-    menuPass(id)
+    menuPass(id, err)
 
 #Log out   
-def log_out():
-    menu()
+def log_out(err):
+    menu(err)
 
 #Log in function
-def log_in():
+def log_in(err):
     os.system('cls')
     print("Log in here:\n")
-
+    print(err)
 
     email=input('Email: ')
     password=input('Password: ')
@@ -99,15 +99,17 @@ def log_in():
         for row in all_users_data:
             try:
                 if ph.verify(row['password'], password):
-                    menuPass(row['user_id'])
+                    err=''
+                    menuPass(row['user_id'], err)
             except VerifyMismatchError:
-                print('Invalid login or password')
-                log_in()
+                err='Invalid login or password'
+                log_in(err)
         
 #Register function
-def register():
+def register(err):
     os.system('cls')
     print("Register here:\n")
+    print(err)
     email=input('Your email: ')
     password=input('Password: ')
     r_password=input('Repeat password: ')
@@ -117,7 +119,14 @@ def register():
             hash_pas=ph.hash(password)
             cursor.execute(f'INSERT INTO users (email, password) values ("{email}", "{hash_pas}")')
             conn.commit()
-            menu()
+            err=''
+            menu(err)
+        else:
+            err='The passwords are not the same'
+            register(err)
+    else:
+        err='Account with this email already exist'
+        register(err)
 
 #Prevent accounts with the same email
 def email_verify(em):
@@ -138,9 +147,9 @@ if __name__=='__main__':
     cursor=conn.cursor(dictionary=True)
 
 
-
+    error=""
     while(True):
-        menu()
+        menu(error)
 
 
 
